@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,7 @@ using SummerUni.Repositories;
 namespace SummerUni.Controllers
 {
     [Route("api/[controller]")]
-    public class UserController: ControllerBase
+    public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
 
@@ -16,25 +15,29 @@ namespace SummerUni.Controllers
         {
             _userRepository = userRepository;
         }
-
-        [HttpGet]
-        public async Task<IEnumerable<User>> GetAllAsync()
-        {
-            var users = await _userRepository.ListAsync();
-            return users;
-        }
-
+        
         [HttpPost]
-        public async Task<IActionResult> PostAsync([FromBody] User user)
+        public async Task<IActionResult> CreateCartAsync([FromBody] User user)
         {
             if (!ModelState.IsValid)
                 return BadRequest();
 
-            await _userRepository.AddAsync(user);
+            await _userRepository.SaveUserAsync(user);
 
             return Ok(user);
-
         }
 
+        [HttpGet("{userId}")]
+        public async Task<User> GetUserAsync(int userId)
+        {
+            return await _userRepository.GetUserAsync(userId);
+        }
+        
+        [HttpGet]
+        public async Task<IEnumerable<User>> ListAsync()
+        {
+            return await _userRepository.ListAsync();
+        } 
+        
     }
 }

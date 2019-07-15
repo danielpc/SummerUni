@@ -16,14 +16,10 @@ namespace SummerUni.Controllers
             _cartRepository = cartRepository;
         }
 
-        [HttpPost("{userId}")]
-        public async Task<IActionResult> AddOrderAsync(int userId, [FromBody] Product product)
+        [HttpPost("{cartId}")]
+        public async Task<IActionResult> CreateCartAsync(int cartId)
         {
-            if (!ModelState.IsValid)
-                return BadRequest();
-
-            await _cartRepository.AddProductAsync(userId, product);
-
+            await _cartRepository.SaveCartAsync(cartId);
             return Ok();
         }
         

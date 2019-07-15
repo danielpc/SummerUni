@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using SummerUni.Entities;
@@ -10,24 +11,38 @@ namespace SummerUni.Repositories
         public CartRepository(ShopContext context) : base(context)
         {
         }
-        
-        public async Task AddProductAsync(int userId, Product product)
+
+
+        public async Task SaveCartAsync(int id)
         {
-            var user = await _context.Users.FindAsync(userId);
-            await _context.Products.AddAsync(product);
-            await _context.SaveChangesAsync();
-            user.Cart.Products.Add(product);
+            await _context.Carts.AddAsync(new Cart {Id = id});
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveProductAsync(int userId, int productId)
+        public async Task AddProductAsync(int id, Product product)
         {
+            var user = await _context.Users
+                .Include(x => x.Cart)
+                .ThenInclude(x => x.Products)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            user.Cart.Products.Add(product);
+            
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RemoveProductAsync(int id, int productId)
+        {
+            var user = await _context.Users
+                .Include(x => x.Cart)
+                .ThenInclude(x => x.Products)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            user.Cart.Products.Remove(_context.Products.Find(productId));
             await _context.SaveChangesAsync();
         }
 
         public async Task<IEnumerable<Cart>> ListAsync()
         {
-            return await _context.Carts.ToListAsync();
+            return await _context.Carts.Include(x => x.Products).ToListAsync();
         }
     }
 }

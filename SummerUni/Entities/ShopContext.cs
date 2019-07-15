@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
 namespace SummerUni.Entities
@@ -9,13 +10,21 @@ namespace SummerUni.Entities
             
         }
 
-        public DbSet<User> Users { get; set; }
         public DbSet<Cart> Carts { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<User> Users { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+
+
+            builder.Entity<Product>()
+                .HasOne(x => x.Cart)
+                .WithMany(x => x.Products)
+                .HasForeignKey(x => x.CartId)
+                .OnDelete(DeleteBehavior.Cascade);
             
+            base.OnModelCreating( builder );
         }
     }
 }

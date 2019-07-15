@@ -6,8 +6,9 @@ namespace SummerUni.Repositories
 {
     public interface ICartRepository
     {
-        Task AddProductAsync(int userId, Product product);
-        Task RemoveProductAsync(int userId, int productId);
+        Task SaveCartAsync(int id);
+        Task AddProductAsync(int id, Product product);
+        Task RemoveProductAsync(int id, int productId);
         Task<IEnumerable<Cart>> ListAsync();
     }
 }
